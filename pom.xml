@@ -6,6 +6,7 @@
     <artifactId>elkoserver</artifactId>
     <packaging>jar</packaging>
     <version>2.0.4-SNAPSHOT</version>
+    <url>http://elkoserver.org</url>
 
     <dependencies>
         <dependency>

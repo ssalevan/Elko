@@ -3,6 +3,8 @@ logs
 target
 bin
 lib
+.idea
 .project
 .classpath
 .settings
+elkoserver.iml

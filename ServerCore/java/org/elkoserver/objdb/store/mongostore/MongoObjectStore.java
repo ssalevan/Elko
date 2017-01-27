@@ -1,6 +1,8 @@
 package org.elkoserver.objdb.store.mongostore;
 
+import com.mongodb.*;
 import org.elkoserver.foundation.boot.BootProperties;
+import org.elkoserver.foundation.server.Server;
 import org.elkoserver.json.JSONArray;
 import org.elkoserver.json.JSONDecodingException;
 import org.elkoserver.json.JSONObject;
@@ -17,15 +19,6 @@ import org.elkoserver.objdb.store.RequestResultHandler;
 import org.elkoserver.objdb.store.ResultDesc;
 import org.elkoserver.objdb.store.UpdateResultDesc;
 import org.elkoserver.util.trace.Trace;
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.Mongo;
-import com.mongodb.MongoException;
-import com.mongodb.WriteResult;
 import org.bson.types.ObjectId;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -39,6 +32,12 @@ import java.util.Map;
  * object database.
  */
 public class MongoObjectStore implements ObjectStore {
+    /** Default period of time to wait for a pool connection establishment. */
+    public static final String DEFAULT_CONNECT_TIMEOUT_MS = "5000";
+
+    /** Default period of time to wait for a response from Mongo. */
+    public static final String DEFAULT_SOCKET_TIMEOUT_MS = "30000";
+
     /** Trace object for diagnostics. */
     private Trace tr;
 
@@ -97,8 +96,23 @@ public class MongoObjectStore implements ObjectStore {
             port = Integer.parseInt(addressStr.substring(colon + 1)) ;
             host = addressStr.substring(0, colon);
         }
+
+        int connectTimeout = Integer.parseInt(
+            props.getProperty(propRoot + ".timeout.connectms",
+                DEFAULT_CONNECT_TIMEOUT_MS));
+        int socketTimeout = Integer.parseInt(
+            props.getProperty(propRoot + ".timeout.socketms",
+                DEFAULT_SOCKET_TIMEOUT_MS));
+
         try {
-            myMongo = new Mongo(host, port);
+            MongoClientOptions clientOptions = MongoClientOptions
+                .builder()
+                .socketTimeout(socketTimeout)
+                .connectTimeout(connectTimeout)
+                .build();
+            List<ServerAddress> seeds = new ArrayList<>();
+            seeds.add(new ServerAddress(host, port));
+            myMongo = new MongoClient(seeds, clientOptions);
         } catch (MongoException e) {
             tr.fatalError("mongodb server " + addressStr + ": unknown host");
         }
