@@ -1,6 +1,5 @@
 package org.elkoserver.objdb.store.mongostore;
 
-import com.mongodb.*;
 import org.elkoserver.foundation.boot.BootProperties;
 import org.elkoserver.json.JSONArray;
 import org.elkoserver.json.JSONDecodingException;
@@ -18,6 +17,15 @@ import org.elkoserver.objdb.store.RequestResultHandler;
 import org.elkoserver.objdb.store.ResultDesc;
 import org.elkoserver.objdb.store.UpdateResultDesc;
 import org.elkoserver.util.trace.Trace;
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.mongodb.Mongo;
+import com.mongodb.MongoException;
+import com.mongodb.WriteResult;
 import org.bson.types.ObjectId;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -90,7 +98,7 @@ public class MongoObjectStore implements ObjectStore {
             host = addressStr.substring(0, colon);
         }
         //try {
-            myMongo = new MongoClient(host, port);
+            myMongo = new Mongo(host, port);
         //} catch (UnknownHostException e) {
         //    tr.fatalError("mongodb server " + addressStr + ": unknown host");
         //}
