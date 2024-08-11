@@ -187,7 +187,7 @@ public class MongoObjectStore implements ObjectStore {
             if (elem instanceof Document) {
                 result.add(documentToJSONObject((Document) elem));
             } else if (elem instanceof List) {
-                result.add(dbListToJSONArray((List) elem);
+                result.add(dbListToJSONArray((List) elem));
             } else {
                 result.add(elem);
             }
