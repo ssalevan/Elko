@@ -168,7 +168,7 @@ public class MongoObjectStore implements ObjectStore {
             if (!key.startsWith("_")) {
                 Object value = dbObj.get(key);
                 if (value instanceof List) {
-                    value = dbListToJSONArray((List<Document>) value);
+                    value = dbListToJSONArray((List) value);
                 } else if (value instanceof Document) {
                     value = documentToJSONObject((Document) value);
                 }
@@ -181,10 +181,16 @@ public class MongoObjectStore implements ObjectStore {
         return result;
     }
 
-    private JSONArray dbListToJSONArray(List<Document> dbList) {
+    private JSONArray dbListToJSONArray(List dbList) {
         JSONArray result = new JSONArray();
-        for (Document elem : dbList) {
-            result.add(documentToJSONObject(elem));
+        for (Object elem : dbList) {
+            if (elem instanceof Document) {
+                result.add(documentToJSONObject((Document) elem));
+            } else if (elem instanceof List) {
+                result.add(dbListToJSONArray((List) elem);
+            } else {
+                result.add(elem);
+            }
         }
         return result;
     }
