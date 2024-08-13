@@ -325,7 +325,9 @@ public class MongoObjectStore implements ObjectStore {
                 } else {
                     UpdateOptions options = new UpdateOptions();
                     options.upsert(true);
-                    collection.updateOne(eq("ref", ref), objectToWrite, options);
+                    Document updateOperation = new Document();
+                    updateOperation.put("$set", objectToWrite);
+                    collection.updateOne(eq("ref", ref), updateOperation, options);
                 }
             } catch (Exception e) {
                 failure = e.getMessage();
@@ -360,8 +362,10 @@ public class MongoObjectStore implements ObjectStore {
                 query.put("version", version);
                 UpdateOptions options = new UpdateOptions();
                 options.upsert(false);
+                Document updateOperation = new Document();
+                updateOperation.put("$set", objectToWrite);
                 UpdateResult result =
-                    collection.updateOne(query, objectToWrite, options);
+                    collection.updateOne(query, updateOperation, options);
                 if (result.getModifiedCount() != 1) {
                     failure = "stale version number on update";
                     atomicFailure = true;
@@ -494,7 +498,7 @@ public class MongoObjectStore implements ObjectStore {
      *
      * @return the DBCollection object corresponding to collectionName.
      */
-    private MongoCollection getCollection(String collectionName) {
+    private MongoCollection<Document> getCollection(String collectionName) {
         if (collectionName == null) {
             return myODBCollection;
         } else {
