@@ -359,7 +359,7 @@ public class MongoObjectStore implements ObjectStore {
                 query.put("ref", ref);
                 query.put("version", version);
                 UpdateOptions options = new UpdateOptions();
-                options.upsert(true);
+                options.upsert(false);
                 UpdateResult result =
                     collection.updateOne(query, objectToWrite, options);
                 if (result.getModifiedCount() != 1) {
